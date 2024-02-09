@@ -1,6 +1,14 @@
-import { createUser, findUserById } from "@/app/lib/UserFunctions";
+import { createUser, findUserById } from "../../_dal/userDal";
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+
+export interface userDetails {
+  name: string;
+  email: string;
+  userId: string;
+  image: string;
+  accessToken: string;
+}
 
 const handler = NextAuth({
   providers: [
