@@ -19,6 +19,7 @@ export const getRepos = async (userId: string) => {
           name: "$name",
           ownerId: "$owner.id",
           ownerName: "$owner.login",
+          selected: 1,
         },
       },
     ])
@@ -27,16 +28,44 @@ export const getRepos = async (userId: string) => {
   return repos;
 };
 
-export const saveRepos = async (repos: any) => {
+export const saveRepos = async (repos: any, userId: string) => {
   const getDb = await db();
 
   const bulkOps = repos.map((obj: any) => ({
     updateMany: {
-      filter: { id: obj.id },
+      filter: {
+        $and: [{ id: obj.id }, { "owner.id": Number(userId) }],
+      },
       update: { $set: { ...obj } },
       upsert: true,
     },
   }));
 
   await getDb.collection(REPOS).bulkWrite(bulkOps);
+};
+
+export const selectRepos = async (repos: string[], userId: string) => {
+  const getDb = await db();
+
+  const bulkUpdateOps = [];
+
+  // Update documents where repo ID is in selectedRepoIds and set selected to true
+  bulkUpdateOps.push({
+    updateMany: {
+      filter: { id: { $in: repos }, "owner.id": Number(userId) },
+      update: { $set: { selected: true } },
+    },
+  });
+
+  // Update documents where repo ID is not in selectedRepoIds and set selected to false
+  bulkUpdateOps.push({
+    updateMany: {
+      filter: { id: { $nin: repos }, "owner.id": Number(userId) },
+      update: { $set: { selected: false } },
+    },
+  });
+
+  await getDb.collection(REPOS).bulkWrite(bulkUpdateOps);
+
+  console.info("Repos of user " + userId + " updated");
 };
