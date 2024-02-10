@@ -1,11 +1,13 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { CheckboxGroup, Skeleton, Checkbox, Button } from "@nextui-org/react";
 import { CustomCheckbox } from "../components/CustomCheckbox";
 import useSWR from "swr";
 
-import { GET_REPOS } from "@/apiEndPoints/api";
+import { GET_REPOS, SYNC_PRS } from "@/apiEndPoints/api";
+import { DASHBOASRD } from "@/RoutePoints/route";
 
 interface repo {
   id: string;
@@ -25,6 +27,8 @@ const Repos = () => {
 
   const { data, isLoading, error } = useSWR(GET_REPOS, fetcher);
 
+  const route = useRouter();
+
   useEffect(() => {
     if (data && data.length) {
       const selectedRepos = [];
@@ -39,6 +43,22 @@ const Repos = () => {
     }
   }, [data]);
 
+  const sync = async () => {
+    const res = await fetch(SYNC_PRS);
+
+    if (res.ok) {
+      setSelectedStatus({ success: true, isLoading: true, error: "" });
+      // route.push(DASHBOASRD);
+    } else {
+      setSelectedStatus((prev) => {
+        return {
+          ...prev,
+          error: "Something went wrong, please try again later",
+        };
+      });
+    }
+  };
+
   const continueBtnHandler = async () => {
     setSelectedStatus((prev) => {
       return { ...prev, isLoading: true };
@@ -51,7 +71,7 @@ const Repos = () => {
       body: JSON.stringify({ repos: selected }),
     });
     if (res.ok) {
-      setSelectedStatus({ success: true, isLoading: true, error: "" });
+      sync();
     } else {
       setSelectedStatus((prev) => {
         return {

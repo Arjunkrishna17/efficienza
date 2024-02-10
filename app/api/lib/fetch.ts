@@ -7,11 +7,5 @@ export const fetcher = async (url: string, accessToken: string) => {
     },
   });
 
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-
-  const response = await res.json();
-
-  return response;
+  return res;
 };

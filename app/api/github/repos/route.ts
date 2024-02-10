@@ -25,7 +25,18 @@ export const GET = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const response = await fetcher(GET_REPOS, accessToken);
 
-  await saveRepos(response, userId);
+  if (!response.ok) {
+    throw new Error(
+      "Failed to fetch repos for user: " +
+        userId +
+        " status: " +
+        response.status
+    );
+  }
+
+  const repoFromGit = await response.json();
+
+  await saveRepos(repoFromGit, userId);
 
   const repos = await getReposService(userId);
 

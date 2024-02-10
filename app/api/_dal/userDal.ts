@@ -12,12 +12,17 @@ interface user {
 }
 
 export async function findUserById(id: string) {
-  const user = (await db()).collection(USERS).findOne({ userId: id });
+  const getDb = await db();
+
+  const user = await getDb.collection(USERS).findOne({ userId: id });
+
   return user || null;
 }
 
 export async function createUser(user: user) {
-  (await db()).collection(USERS).insertOne(user);
+  (await db())
+    .collection(USERS)
+    .replaceOne({ userId: user.userId }, user, { upsert: true });
 }
 
 export const getAccessToken = async (userId: string) => {

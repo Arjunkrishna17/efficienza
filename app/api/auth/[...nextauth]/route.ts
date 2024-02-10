@@ -18,27 +18,24 @@ const handler = NextAuth({
       authorization: {
         params: {
           scope:
-            "read:user user:email repo repo:status read:org repo_deployment admin:repo_hook read:discussion",
+            "read:user user:email repo repo:status public_repo read:org repo_deployment admin:repo_hook read:discussion",
         },
       },
     }),
   ],
 
   callbacks: {
-    async signIn({ user, account }) {
-      const userExists = await findUserById(user.id);
+    async signIn({ user, account, profile, credentials }) {
+      const userData = {
+        name: user.name as string,
+        email: user.email as string,
+        userId: user.id as string,
+        image: user.image as string,
+        accessToken: account?.access_token,
+      };
 
-      if (!userExists) {
-        const userData = {
-          name: user.name as string,
-          email: user.email as string,
-          userId: user.id as string,
-          image: user.image as string,
-          accessToken: account?.access_token,
-        };
-
-        await createUser(userData);
-      }
+      //This will replace the userInfo if already exists.
+      await createUser(userData);
 
       return true;
     },
