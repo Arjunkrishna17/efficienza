@@ -82,6 +82,8 @@ const Repos = () => {
     }
   };
 
+  if (isLoading) return <div>Loading....</div>;
+
   return (
     <div className="flex flex-col w-full h-full justify-center items-center ">
       <div className="w-96 border rounded-lg px-5 py-5 bg-white space-y-5 shadow-lg">
