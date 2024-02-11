@@ -5,6 +5,9 @@ import "./globals.css";
 
 import AuthProvider from "./auth/provider";
 import Header from "./components/Common/Header";
+import { Suspense } from "react";
+import Loading from "./loading";
+import { Providers } from "./providers";
 
 const poppins = Poppins({
   weight: "400",
@@ -24,9 +27,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={poppins.className + " flex flex-col w-full h-screen"}>
+      <body
+        className={
+          poppins.className +
+          " flex flex-col w-full h-screen bg-gradient-to-r from-gray-100 to-gray-200"
+        }
+      >
         <Header />
-        <AuthProvider>{children} </AuthProvider>
+
+        <AuthProvider>
+          <Providers>{children}</Providers>
+        </AuthProvider>
       </body>
     </html>
   );
